@@ -3,8 +3,9 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
+app.use('view engine', 'ejs');
 
-const adminRouter = require('./routes/admin');
+const adminData = require('./routes/admin');
 const shopRouter = require('./routes/shop');
 
 
@@ -12,7 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/admin',adminRouter);
+app.use('/admin',adminData.routes);
 app.use(shopRouter); 
 
 app.use((req, res, next) => {
@@ -21,4 +22,4 @@ app.use((req, res, next) => {
 // const server = http.createServer(app); 
 
 // server.listen(3000);
-app.listen(3000);
+app.listen(3000); 
