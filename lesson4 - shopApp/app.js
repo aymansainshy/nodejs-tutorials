@@ -39,14 +39,18 @@ app.use(shopRoutes);
 app.use(errorController.get404Page);
 
 
-Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+
 User.hasOne(Cart);
 Cart.belongsTo(User);
+
 Cart.belongsToMany(Product, { through: CartItem });
 Product.belongsToMany(Cart, { through: CartItem }); // Optional
-Order.belongsTo(User);
+
 User.hasMany(Order);
+Order.belongsTo(User);
+
 Order.belongsToMany(Product, { through: OrderItem });
 Product.belongsToMany(Order, { through: OrderItem }); // Optional
 
