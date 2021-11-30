@@ -13,17 +13,14 @@ exports.getAddProductPage = (req, res, next) => {
 
 exports.postAddNewProduct = (req, res, next) => {
     const title = req.body.title;
-    const imageUrl = req.body.imageUrl;
-    const description = req.body.description;
     const price = req.body.price;
+    const description = req.body.description;
+    const imageUrl = req.body.imageUrl;
+
+    const product = new Product(title, price, description, imageUrl, null, req.user._id);
     // Product.create ...
-    req.user.createProduct({
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        description: description,
-    }).then((result) => {
-        console.log(console.log("Product created successfully"));
+    product.save().then((result) => {
+        console.log("Product created successfully");
         res.redirect('/admin/products');
     }).catch((err) => {
         console.log(err);
@@ -38,10 +35,9 @@ exports.getEditProduct = (req, res, next) => {
     }
 
     const prodId = req.params.productId;
-    req.user.getProducts({ where: { id: prodId } })
-        // Product.findById(prodId)
-        .then(products => {
-            const product = products[0];
+    Product.findById(prodId)
+        .then(product => {
+
             if (!product) {
                 return res.redirect('/');
             }
@@ -65,26 +61,16 @@ exports.postEditProduct = (req, res, next) => {
     const updatedDescription = req.body.description;
     const updatedPrice = req.body.price;
 
-    Product.findById(prodId).then(product => {
+    const product = new Product(
+        updatedTitle,
+        updatedPrice,
+        updatedDescription,
+        updatedImageUrl,
+        prodId
+    );
 
-        product.title = updatedTitle;
-        product.imageUrl = updatedImageUrl;
-        product.description = updatedDescription;
-        product.price = updatedPrice;
-
-        return product.save();
-
-        // return product.update({
-        //     id: prodId,
-        //     title: updatedTitle,
-        //     price: updatedPrice,
-        //     imageUrl: updatedImageUrl,
-        //     description: updatedDescription,
-        // }).then(result => {
-        //     res.redirect('/admin/products');
-        // })
-
-    }).then(result => {
+    return product.save().then(result => {
+        console.log(result);
         res.redirect('/admin/products');
     }).catch(err => console.log(err));
 }
@@ -92,16 +78,14 @@ exports.postEditProduct = (req, res, next) => {
 
 
 exports.getAdminProducts = (req, res, next) => {
-
-    // Product.findAll() 
-    req.user.getProducts()
-    .then(products => {
-        res.render('admin/products', {
-            products: products,
-            pageTitle: 'All Products',
-            path: '/admin/products',
-        });
-    }).catch(err => console.log(err));
+    Product.fetchAll()
+        .then(products => {
+            res.render('admin/products', {
+                products: products,
+                pageTitle: 'All Products',
+                path: '/admin/products',
+            });
+        }).catch(err => console.log(err));
 }
 
 
@@ -109,14 +93,8 @@ exports.getAdminProducts = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
 
-    Product.destroy({ where: { id: prodId } }).then(result => {
+    Product.deleteById(prodId).then(result => {
         console.log("Product Destroyed Successfully");
         res.redirect('/admin/products');
     }).catch(err => console.log(err));
-
-    // Product.findById(prodId).then(product => {
-    //    return product.destroy();
-    // }).then(result => {
-    //     res.redirect('/admin/products');
-    // }).catch(err => console.log(err));
 }
