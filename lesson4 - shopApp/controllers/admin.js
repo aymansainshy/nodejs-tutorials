@@ -11,20 +11,30 @@ exports.getAddProductPage = (req, res, next) => {
 
 
 
-exports.postAddNewProduct = (req, res, next) => {
+exports.postAddNewProduct = async(req, res, next) => {
+
     const title = req.body.title;
     const price = req.body.price;
     const description = req.body.description;
     const imageUrl = req.body.imageUrl;
+    // const userId = req.user._id;
 
-    const product = new Product(title, price, description, imageUrl, null, req.user._id);
-    // Product.create ...
-    product.save().then((result) => {
+    const product = new Product({
+        title: title,
+        price: price,
+        description: description,
+        imageUrl: imageUrl,
+        userId: req.user, // This is also work mongoose will pick just the Id field .
+    });
+
+    try {
+        await product.save();
+
         console.log("Product created successfully");
         res.redirect('/admin/products');
-    }).catch((err) => {
+    } catch (err) {
         console.log(err);
-    });
+    }
 }
 
 
@@ -53,7 +63,7 @@ exports.getEditProduct = (req, res, next) => {
 
 
 
-exports.postEditProduct = (req, res, next) => {
+exports.postEditProduct = async(req, res, next) => {
 
     const prodId = req.body.productId;
     const updatedTitle = req.body.title;
@@ -61,24 +71,25 @@ exports.postEditProduct = (req, res, next) => {
     const updatedDescription = req.body.description;
     const updatedPrice = req.body.price;
 
-    const product = new Product(
-        updatedTitle,
-        updatedPrice,
-        updatedDescription,
-        updatedImageUrl,
-        prodId
-    );
+    try {
+        const product = await Product.findById(prodId);
 
-    return product.save().then(result => {
-        console.log(result);
+        product.title = updatedTitle;
+        product.price = updatedPrice;
+        product.description = updatedDescription;
+        product.imageUrl = updatedImageUrl;
+
+        await product.save();
         res.redirect('/admin/products');
-    }).catch(err => console.log(err));
+    } catch (err) {
+        return console.log(err);
+    }
 }
 
 
 
 exports.getAdminProducts = (req, res, next) => {
-    Product.fetchAll()
+    Product.find()
         .then(products => {
             res.render('admin/products', {
                 products: products,
@@ -93,7 +104,7 @@ exports.getAdminProducts = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId;
 
-    Product.deleteById(prodId).then(result => {
+    Product.findByIdAndRemove(prodId).then(result => {
         console.log("Product Destroyed Successfully");
         res.redirect('/admin/products');
     }).catch(err => console.log(err));
