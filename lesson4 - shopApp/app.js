@@ -1,11 +1,22 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+const dbUrl = 'mongodb+srv://ayman:ayman123@ayman.4gnhj.mongodb.net/Shop-database?retryWrites=true&w=majority';
 
 const app = express();
 
+const store = new MongoDBStore({
+    uri: dbUrl,
+    collection: 'sessions',
+}); // To save session in MongoDB
+
+
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
+const authRoutes = require('./routes/auth');
 
 const User = require('./models/user');
 
@@ -19,26 +30,34 @@ app.set('views', 'views');
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(
+    session({
+        secret: 'my secret',
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+    })
+);
+
 
 app.use((req, res, next) => {
+    if (!req.session.user) {
+        return next();
+    }
 
-    User.findById('61a8bf0c0797645a77ea2876')
+    User.findById(req.session.user._id)
         .then(user => {
             req.user = user;
-            // console.log(user);
             next();
         }).catch(err => console.log(err));
-
 });
-
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404Page);
 
-
-const dbUrl = 'mongodb+srv://ayman:ayman123@ayman.4gnhj.mongodb.net/Shop-database?retryWrites=true&w=majority';
 
 
 mongoose.connect(dbUrl).then(result => {
@@ -55,7 +74,7 @@ mongoose.connect(dbUrl).then(result => {
             });
             user.save();
         }
-    })
+    });
 
     app.listen(3000);
 }).catch(err => {
