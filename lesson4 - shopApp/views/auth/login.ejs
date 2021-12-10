@@ -7,20 +7,27 @@
         <%- include('../includes/navigation.ejs') %>
 
             <main>
-                <form class="login-form" action="/login" method="POST">
 
-                    <div class="form-control">
-                        <label for="email">E-mail</label>
-                        <input type="email" name="email" id="email">
+                <%if(errorMessage){%>
+                    <div>
+                        <%= errorMessage %>
                     </div>
+                    <%}%>
 
-                    <div class="form-control">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" id="password">
-                    </div>
+                        <form class="login-form" action="/login" method="POST">
 
-                    <button class="btn" type="submit">Login</button>
+                            <div class="form-control">
+                                <label for="email">E-mail</label>
+                                <input type="email" name="email" id="email">
+                            </div>
 
-                </form>
+                            <div class="form-control">
+                                <label for="password">Password</label>
+                                <input type="password" name="password" id="password">
+                            </div>
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                            <button class="btn" type="submit">Login</button>
+                        </form>
             </main>
             <%- include('../includes/end.ejs') %>
