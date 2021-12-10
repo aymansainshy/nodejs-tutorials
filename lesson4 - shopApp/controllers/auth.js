@@ -5,10 +5,17 @@ exports.getLogin = (req, res, next) => {
     // const isLoggedIn = req.get('Cookie').split('=')[1] === 'true';
     console.log(req.session.isLoggedIn);
 
+    let errorMessage = req.flash('error');
+    if (errorMessage.length > 0) {
+        errorMessage = errorMessage[0];
+    } else {
+        errorMessage = null;
+    }
+
     res.render('auth/login', {
         pageTitle: 'login',
         path: '/login',
-        errorMessage: req.flash('error'),
+        errorMessage: errorMessage,
     });
 }
 
@@ -29,6 +36,7 @@ exports.postLogin = async(req, res, next) => {
 
         const isMatch = bcrypt.compare(password, user.password);
         if (!isMatch) {
+            req.flash('error', 'invalid email or password');
             return res.redirect('/login');
         }
 
@@ -49,9 +57,17 @@ exports.postLogin = async(req, res, next) => {
 
 exports.getSignup = (req, res, next) => {
 
+    let errorMessage = req.flash('error');
+    if (errorMessage.length > 0) {
+        errorMessage = errorMessage[0];
+    } else {
+        errorMessage = null;
+    }
+
     res.render('auth/signup', {
         pageTitle: 'signup',
         path: '/signup',
+        errorMessage: errorMessage,
     });
 }
 
@@ -68,6 +84,7 @@ exports.postSignup = async function(req, res, next) {
 
         if (isUserExist) {
             console.log('User already exists');
+            req.flash('error', 'User already exists');
             return res.redirect('/signup');
         }
 
