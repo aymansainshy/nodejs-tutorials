@@ -1,9 +1,24 @@
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+
+
 const User = require('../models/user');
+
+// This to send email to varify user ....
+const transporter = nodemailer.createTransport(
+    sendgridTransport({
+        auth: {
+            api_key: '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',
+        }
+    })
+);
+
+
 
 exports.getLogin = (req, res, next) => {
     // const isLoggedIn = req.get('Cookie').split('=')[1] === 'true';
-    console.log(req.session.isLoggedIn);
+    // console.log(req.session.isLoggedIn);
 
     let errorMessage = req.flash('error');
     if (errorMessage.length > 0) {
@@ -99,6 +114,14 @@ exports.postSignup = async function(req, res, next) {
         await newUser.save();
         console.log('User Created Successfully');
         res.redirect('/login');
+
+        await transporter.sendMail({
+            to: email,
+            from: 'ayman.abdulrahman95@gmail.com',
+            subject: 'Signup succeded',
+            html: '<h1>You Successfully signed up!</h1>',
+        });
+
 
     } catch (err) {
         console.log(err);
