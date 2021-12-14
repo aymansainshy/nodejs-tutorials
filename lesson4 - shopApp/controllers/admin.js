@@ -1,7 +1,6 @@
 const Product = require('../models/product');
 
 
-
 exports.getAddProductPage = (req, res, next) => {
 
     res.render('admin/edit-product', {
@@ -10,7 +9,6 @@ exports.getAddProductPage = (req, res, next) => {
         editing: false,
     });
 }
-
 
 
 exports.postAddNewProduct = async(req, res, next) => {
@@ -76,6 +74,10 @@ exports.postEditProduct = async(req, res, next) => {
     try {
         const product = await Product.findById(prodId);
 
+        if (product.userId.toString() !== req.user._id.toString()) {
+            return res.redirect('/');
+        }
+
         product.title = updatedTitle;
         product.price = updatedPrice;
         product.description = updatedDescription;
@@ -90,24 +92,31 @@ exports.postEditProduct = async(req, res, next) => {
 
 
 
-exports.getAdminProducts = (req, res, next) => {
-    Product.find()
-        .then(products => {
-            res.render('admin/products', {
-                products: products,
-                pageTitle: 'All Products',
-                path: '/admin/products',
-            });
-        }).catch(err => console.log(err));
+exports.getAdminProducts = async(req, res, next) => {
+    try {
+        const userProducts = await Product.find({ userId: req.user._id });
+
+        res.render('admin/products', {
+            products: userProducts,
+            pageTitle: 'All Products',
+            path: '/admin/products',
+        });
+
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 
 
-exports.postDeleteProduct = (req, res, next) => {
+exports.postDeleteProduct = async(req, res, next) => {
     const prodId = req.body.productId;
-
-    Product.findByIdAndRemove(prodId).then(result => {
+    try {
+        await Product.deleteOne({ _id: prodId, userId: req.user._id });
         console.log("Product Destroyed Successfully");
+
         res.redirect('/admin/products');
-    }).catch(err => console.log(err));
+    } catch (err) {
+        console.log(err);
+    }
 }
