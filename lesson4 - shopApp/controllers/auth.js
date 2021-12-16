@@ -86,6 +86,12 @@ exports.getSignup = (req, res, next) => {
         pageTitle: 'signup',
         path: '/signup',
         errorMessage: errorMessage,
+        oldInput: {
+            email: "",
+            password: "",
+            confirmPassword: "",
+        },
+        validationErrors: [],
     });
 }
 
@@ -94,7 +100,6 @@ exports.getSignup = (req, res, next) => {
 exports.postSignup = async function(req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
-    const confirmPassword = req.body.confirmPassword;
 
     const errors = validationResult(req);
 
@@ -105,18 +110,24 @@ exports.postSignup = async function(req, res, next) {
             pageTitle: 'signup',
             path: '/signup',
             errorMessage: errors.array()[0].msg,
+            oldInput: {
+                email: email,
+                password: password,
+                confirmPassword: req.body.confirmPassword
+            },
+            validationErrors: errors.array(),
         });
     }
 
     try {
 
-        const isUserExist = await User.findOne({ email: email });
+        // const isUserExist = await User.findOne({ email: email });
 
-        if (isUserExist) {
-            console.log('User already exists');
-            req.flash('error', 'User already exists');
-            return res.redirect('/signup');
-        }
+        // if (isUserExist) {
+        //     console.log('User already exists');
+        //     req.flash('error', 'User already exists');
+        //     return res.redirect('/signup');
+        // }
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
