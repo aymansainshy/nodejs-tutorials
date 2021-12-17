@@ -40,8 +40,7 @@ exports.getLogin = (req, res, next) => {
 
 
 
-exports.postLogin = async(req, res, next) => {
-    // res.setHeader('Set-Cookie', 'loggedIn=true; Max-Age=10 ');
+exports.postLogin = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -97,7 +96,7 @@ exports.getSignup = (req, res, next) => {
 
 
 
-exports.postSignup = async function(req, res, next) {
+exports.postSignup = async function (req, res, next) {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -186,7 +185,7 @@ exports.getReset = (req, res, next) => {
 // Post Reset Request to Current email Address .....
 exports.postReset = (req, res, next) => {
 
-    crypto.randomBytes(32, async(err, buffer) => {
+    crypto.randomBytes(32, async (err, buffer) => {
         if (err) {
             console.log(err);
             return res.redirect('/reset');
@@ -230,7 +229,7 @@ exports.postReset = (req, res, next) => {
 
 // @desc
 // GET reset user password Page & And sending some information to page ...
-exports.getNewPassword = async(req, res, next) => {
+exports.getNewPassword = async (req, res, next) => {
 
     const token = req.params.token;
     try {
@@ -263,7 +262,7 @@ exports.getNewPassword = async(req, res, next) => {
 
 // @desc
 // Post new password to Reset USER PASSWORD ....
-exports.postNewPassword = async(req, res, next) => {
+exports.postNewPassword = async (req, res, next) => {
     const newPassword = req.body.password;
     const userId = req.body.userId;
     const passwordToken = req.body.passwordToken;

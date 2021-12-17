@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const Product = require('../models/product');
 
 
@@ -7,11 +8,13 @@ exports.getAddProductPage = (req, res, next) => {
         pageTitle: 'Add product',
         path: '/admin/add-product',
         editing: false,
+        hasError: false,
+        errorMessage: null,
     });
 }
 
 
-exports.postAddNewProduct = async(req, res, next) => {
+exports.postAddNewProduct = async (req, res, next) => {
 
     const title = req.body.title;
     const price = req.body.price;
@@ -19,12 +22,13 @@ exports.postAddNewProduct = async(req, res, next) => {
     const imageUrl = req.body.imageUrl;
     // const userId = req.user._id;
 
+
     const product = new Product({
         title: title,
         price: price,
         description: description,
         imageUrl: imageUrl,
-        userId: req.user, // This is also work mongoose will pick just the Id field .
+        userId: req.user._id, // This is also work mongoose will pick just the Id field .
     });
 
     try {
@@ -57,19 +61,42 @@ exports.getEditProduct = (req, res, next) => {
                 path: '/admin/add-product',
                 editing: editMode,
                 product: product,
+                hasError: false,
+                errorMessage: null,
             });
         }).catch(err => console.log(err));
 }
 
 
 
-exports.postEditProduct = async(req, res, next) => {
+exports.postEditProduct = async (req, res, next) => {
 
     const prodId = req.body.productId;
     const updatedTitle = req.body.title;
     const updatedImageUrl = req.body.imageUrl;
     const updatedDescription = req.body.description;
     const updatedPrice = req.body.price;
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        console.log(errors.array());
+        return res.status(422).render('admin/edit-product', {
+            pageTitle: 'Edit product',
+            path: '/admin/add-product',
+            editing: true,
+            hasError: true,
+            errorMessage: errors.array()[0].msg,
+            product: {
+                title: updatedTitle,
+                price: updatedPrice,
+                description: updatedDescription,
+                imageUrl: updatedImageUrl,
+                _id: userId,
+            },
+        });
+    }
+
 
     try {
         const product = await Product.findById(prodId);
@@ -92,7 +119,7 @@ exports.postEditProduct = async(req, res, next) => {
 
 
 
-exports.getAdminProducts = async(req, res, next) => {
+exports.getAdminProducts = async (req, res, next) => {
     try {
         const userProducts = await Product.find({ userId: req.user._id });
 
@@ -109,7 +136,7 @@ exports.getAdminProducts = async(req, res, next) => {
 
 
 
-exports.postDeleteProduct = async(req, res, next) => {
+exports.postDeleteProduct = async (req, res, next) => {
     const prodId = req.body.productId;
     try {
         await Product.deleteOne({ _id: prodId, userId: req.user._id });

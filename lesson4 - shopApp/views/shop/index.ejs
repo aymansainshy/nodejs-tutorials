@@ -10,14 +10,17 @@
                     <div class="grid">
                         <% for (let product of products) { %>
                             <article class="card product-item">
+
                                 <header class="card__header">
                                     <h1 class="product__title">
                                         <%= product.title %>
                                     </h1>
                                 </header>
+
                                 <div class="card__image">
                                     <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
                                 </div>
+
                                 <div class="card__content">
                                     <h2 class="product__price">$
                                         <%= product.price %>
@@ -26,6 +29,7 @@
                                         <%= product.description %>
                                     </p>
                                 </div>
+
                                 <div class="card__actions">
                                     <a href="/products/<%= product._id %>" class="btn">Details</a>
 
@@ -33,6 +37,7 @@
                                         <%- include('../includes/add-to-cart.ejs', {product: product}) %>
                                             <%}%>
                                 </div>
+
                             </article>
                             <% } %>
                     </div>
