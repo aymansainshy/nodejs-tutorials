@@ -36,8 +36,11 @@ exports.postAddNewProduct = async (req, res, next) => {
 
         console.log("Product created successfully");
         res.redirect('/admin/products');
+        
     } catch (err) {
-        console.log(err);
+        const error = new Error(err);
+        error.status(500);
+        return next(error);
     }
 }
 

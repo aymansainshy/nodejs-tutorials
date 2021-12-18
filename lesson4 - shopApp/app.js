@@ -47,6 +47,8 @@ app.use(
 app.use(csrfProtection);
 app.use(flash());
 
+
+
 app.use((req, res, next) => {
     if (!req.session.user) {
         return next();
@@ -54,10 +56,17 @@ app.use((req, res, next) => {
 
     User.findById(req.session.user._id)
         .then(user => {
+            if (!user) {
+                return next();
+            }
             req.user = user;
             next();
-        }).catch(err => console.log(err));
+        }).catch(err => {
+            throw new Error(err);
+        });
 });
+
+
 
 // To Send local variables to every view .. 
 app.use((req, res, next) => {
@@ -72,6 +81,11 @@ app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use(errorController.get404Page);
+
+// Error hendling middleware.
+app.use((error, req, res, next) => {
+    console.log(error);
+});
 
 
 

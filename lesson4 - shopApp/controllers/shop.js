@@ -89,7 +89,7 @@ exports.postCartDeleteProduct = (req, res, next) => {
 
 
 
-exports.postOrder = async(req, res, next) => {
+exports.postOrder = async (req, res, next) => {
     try {
         const productsData = await req.user.cart.populate('items.product');
 
@@ -97,7 +97,7 @@ exports.postOrder = async(req, res, next) => {
 
             return {
                 quantity: i.quantity,
-                product: {...i.product._doc },
+                product: { ...i.product._doc },
             }
         });
 
@@ -121,7 +121,7 @@ exports.postOrder = async(req, res, next) => {
 
 
 
-exports.getOrders = async(req, res, next) => {
+exports.getOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ 'user.userId': req.user._id });
 
