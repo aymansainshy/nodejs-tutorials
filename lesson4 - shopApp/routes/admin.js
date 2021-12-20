@@ -15,7 +15,7 @@ router.post('/add-product',
     [
         // [ Vlidate product field ... ] ...........
         body('title').isString().isLength({ min: 3 }).trim(),
-        body('imageUrl').trim().isURL(),
+        // body('imageUrl').trim().isURL(),
         body('price').isFloat(),
         body('description').isLength({ min: 8, max: 400 }).trim(),
     ],
@@ -27,7 +27,7 @@ router.post('/edit-product',
     [
         // [ Vlidate product field ... ] ........... 
         body('title').isString().isLength({ min: 3 }).trim(),
-        body('imageUrl').trim().isURL(),
+        // body('imageUrl').trim().isURL(),
         body('price').isFloat(),
         body('description').isLength({ min: 8, max: 400 }).trim(),
     ],

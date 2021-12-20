@@ -17,10 +17,12 @@
         "jshint": "^2.13.1",
         "mongodb": "^4.1.4",
         "mongoose": "^6.0.12",
+        "multer": "^1.4.4",
         "mysql2": "^2.3.2",
         "nodemailer": "^6.7.2",
         "nodemailer-sendgrid-transport": "^0.2.0",
         "nodemon": "^2.0.13",
+        "pdfkit": "^0.13.0",
         "sequelize": "^4.44.4"
     },
     "devDependencies": {},

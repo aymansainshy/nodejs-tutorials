@@ -5,6 +5,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 
 const dbUrl = 'mongodb+srv://ayman:ayman123@ayman.4gnhj.mongodb.net/Shop-database?retryWrites=true&w=majority';
@@ -28,12 +29,37 @@ const User = require('./models/user');
 const errorController = require('./controllers/error');
 
 
+// Configration to store file ......................................................
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString() + '-' + file.originalname);
+    }
+});
+
+
+// Filter File before saving it ....................................................
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' ||
+        file.mimetype == 'image/png' ||
+        file.mimetype == 'image/jpg') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false })); // To Extract Data from incomming request ...
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));  // To Extract File Data from incomming request ...
+
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(
     session({

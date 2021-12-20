@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const Product = require('../models/product');
+const { deleteFile } = require('../utils/file');
 
 
 exports.getAddProductPage = (req, res, next) => {
@@ -19,15 +20,17 @@ exports.postAddNewProduct = async (req, res, next) => {
     const title = req.body.title;
     const price = req.body.price;
     const description = req.body.description;
-    const imageUrl = req.body.imageUrl;
+    const image = req.file;
     // const userId = req.user._id;
-
+    if (!image) {
+        return;
+    }
 
     const product = new Product({
         title: title,
         price: price,
         description: description,
-        imageUrl: imageUrl,
+        imageUrl: image.path,
         userId: req.user._id, // This is also work mongoose will pick just the Id field .
     });
 
@@ -36,7 +39,7 @@ exports.postAddNewProduct = async (req, res, next) => {
 
         console.log("Product created successfully");
         res.redirect('/admin/products');
-        
+
     } catch (err) {
         const error = new Error(err);
         error.status(500);
@@ -76,7 +79,7 @@ exports.postEditProduct = async (req, res, next) => {
 
     const prodId = req.body.productId;
     const updatedTitle = req.body.title;
-    const updatedImageUrl = req.body.imageUrl;
+    const image = req.file;
     const updatedDescription = req.body.description;
     const updatedPrice = req.body.price;
 
@@ -94,7 +97,6 @@ exports.postEditProduct = async (req, res, next) => {
                 title: updatedTitle,
                 price: updatedPrice,
                 description: updatedDescription,
-                imageUrl: updatedImageUrl,
                 _id: userId,
             },
         });
@@ -111,7 +113,11 @@ exports.postEditProduct = async (req, res, next) => {
         product.title = updatedTitle;
         product.price = updatedPrice;
         product.description = updatedDescription;
-        product.imageUrl = updatedImageUrl;
+
+        if (image) {
+            deleteFile(product.imageUrl); //DELETE Ole image for product .
+            product.imageUrl = image.path;
+        }
 
         await product.save();
         res.redirect('/admin/products');
@@ -142,6 +148,14 @@ exports.getAdminProducts = async (req, res, next) => {
 exports.postDeleteProduct = async (req, res, next) => {
     const prodId = req.body.productId;
     try {
+ 
+        const product = await Product.findById(prodId);
+        if (!product) {
+            return next(new Error('Product not found'));
+        }
+        deleteFile(product.imageUrl); //DELETE Old image for product .
+
+
         await Product.deleteOne({ _id: prodId, userId: req.user._id });
         console.log("Product Destroyed Successfully");
 
