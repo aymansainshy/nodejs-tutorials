@@ -9,9 +9,11 @@ const feedController = require('../controllers/feed');
 router.get('/posts', feedController.getPosts);
 
 
+
 // @desc
 // GET { /feed/post:id } Single Post endpoint 
 router.get('/posts/:postId', feedController.getPost);
+
 
 
 // @desc
@@ -22,6 +24,23 @@ router.post('/post',
         body('content').trim().isLength({ min: 5 }),
     ]
     , feedController.createPost);
+
+
+
+// @desc
+// PUT { /feed/post/:postId } create Posts endpoint   
+router.put('/posts/:postId',
+    [
+        body('title').trim().isLength({ min: 5 }),
+        body('content').trim().isLength({ min: 5 }),
+    ]
+    , feedController.updatePost); 
+
+
+
+// @desc
+// DELETE { /feed/post/:postId } Delete single post endpoint  
+router.delete('/posts/:postId', feedController.deletePost);
 
 
 module.exports = router;   
