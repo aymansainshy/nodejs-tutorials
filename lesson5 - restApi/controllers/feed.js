@@ -8,9 +8,16 @@ const Post = require('../models/post');
 // GET All Posts Controller ......
 exports.getPosts = async (req, res, next) => {
 
+    const currentPage = req.query.page || 1;
+    const perPage = 4;
+    let totalItems;
+
     try {
-        const posts = await Post.find();
-        res.status(200).json({ posts: posts });
+        totalItems = await Post.countDocuments();
+
+        const posts = await Post.find().skip((currentPage - 1) * perPage).limit(perPage);
+
+        res.status(200).json({ totalItems: totalItems, posts: posts });
 
     } catch (error) {
         if (!error.statusCode) {
@@ -205,7 +212,6 @@ exports.deletePost = async (req, res, next) => {
         const result = await Post.findByIdAndRemove(postId);
         res.status(200).json({
             message: 'Posts Delelted successfully!',
-            post: result,
         });
 
     } catch (err) {

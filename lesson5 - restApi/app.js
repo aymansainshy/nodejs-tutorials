@@ -8,6 +8,8 @@ const feedRoutes = require('./routes/feed');
 
 const app = express();
 
+const maxSize = 2 * 1024 * 1024 * 1024;
+
 
 // For upload files to server...........
 const fileStorage = multer.diskStorage({
@@ -36,7 +38,13 @@ const fileFilter = (req, file, cb) => {
 
 // app.use(bodyPa.urlencoded()); // x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json ................
-app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')); // Configration for file Upload .
+
+app.use(multer({
+    storage: fileStorage,
+    fileFilter: fileFilter,
+    limits: { fileSize: maxSize },
+}).single('image')); // Configration for file Upload .
+
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
