@@ -4,10 +4,10 @@ const { body } = require('express-validator');
 const User = require('../models/user');
 const authController = require('../controllers/auth');
 
-const router = express.Router(); 
+const router = express.Router();
 
-// @desc
-// GET { /feed/post } Posts endpoint 
+// @desc  ... Create New User 
+// @route ... POST { /auth/singup } ...
 router.post('/signup',
     [
         body('email')
@@ -21,12 +21,18 @@ router.post('/signup',
                 })
             })
             .normalizeEmail(),
- 
+
         body('password').trim().isLength({ min: 5 }),
 
         body('name').trim().not().isEmpty()
     ]
     , authController.signup);
+
+
+
+// @desc  
+// POST {/auth/login } .... Login User 
+router.post('/login', authController.logIn);
 
 
 module.exports = router;
