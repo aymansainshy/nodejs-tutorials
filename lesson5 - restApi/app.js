@@ -5,10 +5,11 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
-const maxSize = 2 * 1024 * 1024 * 1024;
+const maxSize = 2 * 1024 * 1024;
 
 
 // For upload files to server...........
@@ -57,15 +58,18 @@ app.use((req, res, next) => {
 
 
 app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
 
 
 // Hendling genaral Errors .........
 app.use((error, req, res, next) => {
-    console.log(error);
-
+    
     const status = error.statusCode || 500;
     const message = error.message;
     const errors = error.errors;
+    
+
+    console.log(error);
 
     res.status(status).json({
         message: message,
