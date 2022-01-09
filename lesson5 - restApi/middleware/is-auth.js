@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
 
     if (!authHeader) {
         const error = new Error("Not authenticated");
-        error.status = 401;
+        error.statusCode = 401;
         throw error;
     }
 
@@ -20,14 +20,14 @@ module.exports = (req, res, next) => {
         decodedToken = jwt.verify(token, 'Secret');
 
     } catch (error) {
-        error.status = 500;
+        error.statusCode = 500;
         throw error;
     }
 
     // If its not valid token Throw an error.
     if (!decodedToken) {
         const error = new Error("Not authenticated");
-        error.status = 401;
+        error.statusCode = 401;
         throw error;
     }
 

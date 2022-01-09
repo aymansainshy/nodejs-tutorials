@@ -2,6 +2,7 @@ const fs = require('fs');
 const { validationResult } = require('express-validator');
 
 const Post = require('../models/post');
+const User = require('../models/user');
 
 
 // @desc
@@ -106,18 +107,22 @@ exports.createPost = async (req, res, next) => {
             title: title,
             content: content,
             imageUrl: imageUrl,
-            creator: {
-                name: 'Ayman Sainshy',
-            },
+            creator: req.userId,
         });
 
         const result = await post.save();
+
+        const user = await User.findById(req.userId);
+
+        user.posts.push(post);
+   
+        await user.save();
 
         res.status(201).json({
             message: 'Posts created successfully!',
             post: result,
         });
-
+ 
     } catch (error) {
         if (!error.statusCode) {
             error.statusCode = 500;
@@ -147,17 +152,17 @@ exports.updatePost = async (req, res, next) => {
 
     const title = req.body.title;
     const content = req.body.content;
-    let imageUrl = req.body.imageUrl;
+    // let imageUrl = req.body.imageUrl;
 
-    if (req.file) {
-        imageUrl = req.file.path;
-    }
+    // if (req.file) {
+    //     imageUrl = req.file.path;
+    // }
 
-    if (!imageUrl) {
-        const error = new Error('No Image Provided.');
-        error.statusCode = 422;
-        throw error;
-    }
+    // if (!imageUrl) {
+    //     const error = new Error('No Image Provided.');
+    //     error.statusCode = 422;
+    //     throw error;
+    // }
 
 
     try {
@@ -165,7 +170,13 @@ exports.updatePost = async (req, res, next) => {
 
         if (!post) {
             const error = new Error("NO POST FOUND");
-            error.status = 404;
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(post.creator.toString() !== req.userId.toString()){
+            const error = new Error("Not Authorized");
+            error.statusCode = 403;
             throw error;
         }
 
@@ -203,10 +214,16 @@ exports.deletePost = async (req, res, next) => {
 
         if (!post) {
             const error = new Error("NO POST FOUND");
-            error.status = 404;
+            error.statusCode = 404;
             throw error;
         }
 
+        if(post.creator.toString() !== req.userId.toString()){
+            const error = new Error("Not Authorized");
+            error.statusCode = 403;
+            throw error;
+        }
+ 
         // clearImage(post.imageUrl);
 
         const result = await Post.findByIdAndRemove(postId);

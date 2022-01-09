@@ -10,7 +10,7 @@ const postSchema = new Schema({
 
     imageUrl: {
         type: String,
-        required: true,
+        // required: true,
     },
 
     content: {
@@ -19,7 +19,8 @@ const postSchema = new Schema({
     },
 
     creator: {
-        type: Object,
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true,
     }
     

@@ -13,7 +13,7 @@ router.get('/posts', isAuth, feedController.getPosts);
 
 // @desc
 // GET { /feed/post:id } Single Post endpoint 
-router.get('/posts/:postId', feedController.getPost);
+router.get('/posts/:postId', isAuth, feedController.getPost);
 
 
 
@@ -24,13 +24,13 @@ router.post('/post',
         body('title').trim().isLength({ min: 5 }),
         body('content').trim().isLength({ min: 5 }),
     ]
-    , feedController.createPost);
+    , isAuth, feedController.createPost);
 
 
 
 // @desc
-// PUT { /feed/post/:postId } create Posts endpoint   
-router.put('/posts/:postId',
+// PUT { /feed/post/:postId } Edit Post endpoint   
+router.put('/posts/:postId', isAuth,
     [
         body('title').trim().isLength({ min: 5 }),
         body('content').trim().isLength({ min: 5 }),
@@ -41,7 +41,7 @@ router.put('/posts/:postId',
 
 // @desc
 // DELETE { /feed/post/:postId } Delete single post endpoint  
-router.delete('/posts/:postId', feedController.deletePost);
+router.delete('/posts/:postId', isAuth, feedController.deletePost);
 
 
 module.exports = router;   
