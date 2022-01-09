@@ -60,9 +60,9 @@ exports.logIn = async (req, res, next) => {
             throw error;
         }
 
-        const isEqual = await bcrypt.compare(password, user.password);
+        const isPasswordEqual = await bcrypt.compare(password, user.password);
 
-        if (!isEqual) {
+        if (!isPasswordEqual) {
             const error = new Error('Wrong password');
             error.statusCode = 401;
             throw error;
@@ -78,7 +78,7 @@ exports.logIn = async (req, res, next) => {
 
         res.status(200).json({
             token: token,
-            user: user,
+            user: user._id,
             // user: { ...user._doc, token: token },
         });
 
