@@ -13,7 +13,7 @@ router.get('/posts', isAuth, feedController.getPosts);
 
 // @desc
 // GET { /feed/post:id } Single Post endpoint 
-router.get('/posts/:postId', isAuth, feedController.getPost);
+router.get('/posts/:postId', isAuth, feedController.getSinglePost);
 
 
 

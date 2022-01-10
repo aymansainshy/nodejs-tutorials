@@ -5,18 +5,20 @@ const Post = require('../models/post');
 const User = require('../models/user');
 
 
-// @desc
+// @desc 
 // GET All Posts Controller ......
 exports.getPosts = async (req, res, next) => {
 
     const currentPage = req.query.page || 1;
     const perPage = 4;
-    let totalItems;
 
     try {
-        totalItems = await Post.countDocuments();
+        // To user implecite Promise user exec();
+        const totalItems = await Post.countDocuments().exec();
 
-        const posts = await Post.find().skip((currentPage - 1) * perPage).limit(perPage);
+        const posts = await Post.find()
+            .skip((currentPage - 1) * perPage)
+            .limit(perPage);
 
         res.status(200).json({ totalItems: totalItems, posts: posts });
 
@@ -26,21 +28,6 @@ exports.getPosts = async (req, res, next) => {
         }
         next(error);
     }
-
-    // res.status(200).json({
-    //     posts: [
-    //         {
-    //             _id: '1',
-    //             title: 'First posts',
-    //             content: 'This is the first post',
-    //             imageUrl: 'http://localhost/images/1.jpg',
-    //             creator: {
-    //                 name: 'Ayman Sainshy',
-    //             },
-    //             createdAt: new Date(),
-    //         },
-    //     ]
-    // });
 }
 
 
@@ -48,7 +35,7 @@ exports.getPosts = async (req, res, next) => {
 
 // @desc
 // GET Single Post Controller ......
-exports.getPost = async (req, res, next) => {
+exports.getSinglePost = async (req, res, next) => {
     const postId = req.params.postId;
     try {
         const post = await Post.findById(postId);
@@ -92,7 +79,7 @@ exports.createPost = async (req, res, next) => {
         }
 
 
-        // Check if NOT FileAppender
+        // Check if NOT FileAppended
         if (!req.file) {
             const error = new Error('No Image Provided.');
             error.statusCode = 422;
