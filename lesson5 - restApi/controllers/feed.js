@@ -115,14 +115,14 @@ exports.createPost = async (req, res, next) => {
         const user = await User.findById(req.userId);
 
         user.posts.push(post);
-   
+
         await user.save();
 
         res.status(201).json({
             message: 'Posts created successfully!',
             post: result,
         });
- 
+
     } catch (error) {
         if (!error.statusCode) {
             error.statusCode = 500;
@@ -174,7 +174,7 @@ exports.updatePost = async (req, res, next) => {
             throw error;
         }
 
-        if(post.creator.toString() !== req.userId.toString()){
+        if (post.creator.toString() !== req.userId.toString()) {
             const error = new Error("Not Authorized");
             error.statusCode = 403;
             throw error;
@@ -218,15 +218,21 @@ exports.deletePost = async (req, res, next) => {
             throw error;
         }
 
-        if(post.creator.toString() !== req.userId.toString()){
+        if (post.creator.toString() !== req.userId.toString()) {
             const error = new Error("Not Authorized");
             error.statusCode = 403;
             throw error;
         }
- 
+
         // clearImage(post.imageUrl);
 
         const result = await Post.findByIdAndRemove(postId);
+
+        // clear post from user collection User.posts = [];
+        const user = await User.findById(req.userId);
+        user.posts.pull(result);
+        await user.save();
+
         res.status(200).json({
             message: 'Posts Delelted successfully!',
         });
