@@ -14,9 +14,11 @@ const maxSize = 2 * 1024 * 1024;
 
 // For upload files to server...........
 const fileStorage = multer.diskStorage({
+    
     destination: (req, file, cb) => {
         cb(null, 'images');
     },
+
     filename: (req, file, cb) => {
         cb(null, new Date().toISOString() + '-' + file.originalname);
     },
@@ -63,11 +65,10 @@ app.use('/auth', authRoutes);
 
 // Hendling genaral Errors .........
 app.use((error, req, res, next) => {
-    
+
     const status = error.statusCode || 500;
     const message = error.message;
     const errors = error.errors;
-    
 
     console.log(error);
 
@@ -83,8 +84,17 @@ const dbUrl = 'mongodb+srv://ayman:ayman123@ayman.4gnhj.mongodb.net/Blog-databas
 
 
 mongoose.connect(dbUrl).then(results => {
-    app.listen(8080, () => {
+
+    const server = app.listen(8080, () => {
         console.log("App Started in port 8080");
     });
+
+    // Shared socket IO instance globaly 
+    const io = require('./socket-io').init(server);
+
+    io.on('connection', socket => {
+        console.log('Client Connected ...');
+    });
+
 }).catch(err => console.log(err));
 
