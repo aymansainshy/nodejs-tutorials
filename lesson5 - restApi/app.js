@@ -14,7 +14,7 @@ const maxSize = 2 * 1024 * 1024;
 
 // For upload files to server...........
 const fileStorage = multer.diskStorage({
-    
+
     destination: (req, file, cb) => {
         cb(null, 'images');
     },
@@ -41,6 +41,7 @@ const fileFilter = (req, file, cb) => {
 
 // app.use(bodyPa.urlencoded()); // x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json ................
+
 
 app.use(multer({
     storage: fileStorage,
