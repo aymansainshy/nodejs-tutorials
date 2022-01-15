@@ -6,6 +6,8 @@ class Product {
   late List<String> supCategories; // [1, 2 ,3]
   late Specification specification;
   late String description;
+  late int soldQuantity;
+  late double rate; //
   late bool isActive;
   late double decount; //10% - 0.10
   late List<String> pictures;
